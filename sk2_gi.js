@@ -211,26 +211,48 @@ function GetImgUrl(){
 			return document.getElementsByClassName('wXeWr islib nfEiy mM5pbd')[temp].getAttribute ("href");
 		},temp);
 	
-		duri=decodeURIComponent(uri.replace(/\+/g,  " "));
-		img_uri = duri.split("&");
-		img_uri = img_uri[0].split ("=");
-		img_uri = img_uri[1]
-		fs.write("test.tmp",img_uri+"\n","a")
+		var from_serch =page.evaluate(function(temp) {
+			return document.getElementsByClassName('sMi44c lNHeqe')[temp].getElementsByTagName("div")[0].innerText;
+		},temp);
 		
-		line_to_csv [7]= line_to_csv [7]+" "+img_uri;
+		console.log("from_serch============"+from_serch)
 		
-		//html
-		fs.write("analiz.html",'<img src='+img_uri+">"+"\n","a");
-		fs.write("analiz.html",'<br>'+"\n","a");
-		
-		console.log("img_uri="+img_uri)
-	
-		if (temp <10){// сколько картинок берем
-			temp++;
-			GetImgUrl();
+		if (from_serch){
+			duri=decodeURIComponent(uri.replace(/\+/g,  " "));
+			img_uri = duri.split("&");
+			img_uri = img_uri[0].split ("=");
+			img_uri = img_uri[1]
+			fs.write("test.tmp",img_uri+"\n","a")
 			
+			line_to_csv [7]= line_to_csv [7]+" "+img_uri;
+			
+			//html
+			fs.write("analiz.html",'<p>'+'Наименование в базе 1с: '+name_on_base+'</p>'+"\n","a");
+			//fs.write("analiz.html",'<br>'+"\n","a");
+			fs.write("analiz.html",'<p>'+'Описание из поиска: '+from_serch+'</p>'+"\n","a");
+			//fs.write("analiz.html",'<br>'+"\n","a");
+			fs.write("analiz.html",'<a href="'+img_uri+'">Ссылка на картинку:</a>'+"\n","a");
+			
+			fs.write("analiz.html",'<p3>'+'Ссылка на картинку = '+img_uri+'</p3>'+"\n","a");
+			fs.write("analiz.html",'<br>'+"\n","a");
+			fs.write("analiz.html",'<img src='+img_uri+">"+"\n","a");
+			fs.write("analiz.html",'<br>'+"\n","a");
+			
+			console.log("img_uri="+img_uri)
+			
+			if (temp <25){// сколько картинок берем
+				temp++;
+				GetImgUrl();
+				
+			} else {
+				console.log ("WriteCSV");
+				line_to_csv [7]=line_to_csv [7].trim();
+				var to_csv = line_to_csv.join(';')
+				fs.write("import.csv", to_csv+"\n","a");
+				setTimeout(ReadFromFile, 1000);	
+			}
 		} else {
-			console.log ("WriteCSV");
+			console.log ("No more pict ... WriteCSV");
 			line_to_csv [7]=line_to_csv [7].trim();
 			var to_csv = line_to_csv.join(';')
 			fs.write("import.csv", to_csv+"\n","a");
